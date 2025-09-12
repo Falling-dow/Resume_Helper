@@ -1,0 +1,115 @@
+name: CI/CD Pipeline
+
+on:
+  push:
+    branches: [main, develop]
+  pull_request:
+    branches: [main]
+
+jobs:
+  test-backend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Python
+        uses: actions/setup-python@v4
+        with:
+          python-version: '3.11'
+
+      - name: Cache pip packages
+        uses: actions/cache@v3
+        with:
+          path: ~/.cache/pip
+          key: ${{ runner.os }}-pip-${{ hashFiles('backend/requirements/*.txt') }}
+
+      - name: Install dependencies
+        run: |
+          cd backend
+          pip install -r requirements/dev.txt
+
+      - name: Run tests
+        run: |
+          cd backend
+          pytest -q --maxfail=1 --disable-warnings
+
+      - name: Lint code
+        run: |
+          cd backend
+          flake8 app/
+          black --check app/
+          mypy app/
+
+  test-frontend:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v3
+        with:
+          node-version: '18'
+          cache: 'npm'
+          cache-dependency-path: frontend/package-lock.json
+
+      - name: Install dependencies
+        run: |
+          cd frontend
+          npm ci
+
+      - name: Run tests
+        run: |
+          cd frontend
+          npm run test --silent --if-present
+
+      - name: Build
+        run: |
+          cd frontend
+          npm run build --if-present
+
+  build-and-push:
+    needs: [test-backend, test-frontend]
+    runs-on: ubuntu-latest
+    if: github.ref == 'refs/heads/main'
+
+    steps:
+      - uses: actions/checkout@v3
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v2
+
+      - name: Login to Aliyun Registry
+        if: ${{ secrets.ALIYUN_REGISTRY_PASSWORD != '' }}
+        run: |
+          echo ${{ secrets.ALIYUN_REGISTRY_PASSWORD }} | \
+          docker login --username=${{ secrets.ALIYUN_REGISTRY_USERNAME }} \
+          --password-stdin registry.cn-shanghai.aliyuncs.com
+
+      - name: Build and push images
+        if: ${{ secrets.ALIYUN_REGISTRY_PASSWORD != '' }}
+        run: |
+          docker build -t registry.cn-shanghai.aliyuncs.com/resume-helper/backend:${{ github.sha }} ./backend
+          docker push registry.cn-shanghai.aliyuncs.com/resume-helper/backend:${{ github.sha }}
+
+          docker build -t registry.cn-shanghai.aliyuncs.com/resume-helper/frontend:${{ github.sha }} ./frontend
+          docker push registry.cn-shanghai.aliyuncs.com/resume-helper/frontend:${{ github.sha }}
+
+  deploy:
+    needs: build-and-push
+    runs-on: ubuntu-latest
+    if: ${{ secrets.ALIYUN_HOST != '' }}
+
+    steps:
+      - name: Deploy to Aliyun ECS
+        uses: appleboy/ssh-action@v0.1.5
+        with:
+          host: ${{ secrets.ALIYUN_HOST }}
+          username: ${{ secrets.ALIYUN_USERNAME }}
+          key: ${{ secrets.ALIYUN_SSH_KEY }}
+          script: |
+            cd /app/resume-helper
+            git pull origin main
+            docker-compose pull || true
+            docker-compose up -d --remove-orphans
+            docker system prune -f
+

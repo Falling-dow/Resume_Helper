@@ -1,0 +1,36 @@
+# Global
+.DS_Store
+*.log
+*.pid
+*.seed
+*.idea/
+.vscode/
+node_modules/
+dist/
+build/
+.cache/
+
+# Python
+__pycache__/
+.pytest_cache/
+.mypy_cache/
+*.pyc
+*.pyo
+.venv/
+venv/
+
+# Env files
+*.env
+.env
+backend/.env
+frontend/.env
+
+# Docker
+*.tar
+*.img
+
+# Coverage
+coverage.xml
+.coverage
+htmlcov/
+

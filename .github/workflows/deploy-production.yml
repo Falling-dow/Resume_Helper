@@ -1,0 +1,22 @@
+name: Deploy Production
+
+on:
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Deploy to Production ECS
+        uses: appleboy/ssh-action@v0.1.5
+        with:
+          host: ${{ secrets.ALIYUN_HOST }}
+          username: ${{ secrets.ALIYUN_USERNAME }}
+          key: ${{ secrets.ALIYUN_SSH_KEY }}
+          script: |
+            cd /app/resume-helper
+            git pull origin main
+            docker-compose pull || true
+            docker-compose up -d --remove-orphans
+            docker system prune -f
+
