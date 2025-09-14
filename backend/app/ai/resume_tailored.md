@@ -1,31 +1,31 @@
-潘越
-电话: 18061643108 | 邮箱: yuepan2025@gmail.com | 出生年月: 2001-07
+# Yue Pan
+**Contact:** (+1) 929-920-1662 or (+86) 180-6164-3108 | yp2734@columbia.edu
 
-### 教育背景
-哥伦比亚大学 | 计算机工程硕士 | 2024.9-2025.12 | 纽约,美国  
-西安交通大学 | 自动化科学与技术学士 | 2019.8-2023.7 | 西安,中国  
+## Experience
+**Credit Risk Strategy Intern** | Alipay - Huabei Credit Team | May 2025 – Aug 2025  
+- Built credit risk monitoring reports and analyzed key metrics including FPD and delinquency rates to support data-driven decision-making.  
+- Conducted root-cause analysis on approval rates, implementing strategies that increased simplified signing approval from 89.9% to 97.3% and standard signing from 30.3% to 45.0%.  
+- Designed and implemented a credit line growth strategy for 16.55M users, resulting in reduced delinquency rates and potential exposure of CNY 80.3B (USD 11.2B).  
 
-### 实习经历
-支付宝-花呗用户数团队 | 数据科学实习生 | 2025.05-2025.08  
-- 搭建并自动化信用风险监控报表，覆盖逾期率及Vintage曲线，支持组合风险监测与模型评估。  
-- 通过数据分析对签约链路进行通过率溯因，提出改进策略，提升链路通过率。  
-- 设计基于模型约束的提额策略，降低组合逾期率。  
+**Financial Risk Control Strategy Intern** | KN Group | Nov 2024 – Feb 2025  
+- Analyzed a 29% drop in daily loan disbursement using Hive and Python, identifying model drift and verification issues, and proposed adjustments to restore stability.  
+- Engineered a feature selection pipeline integrating multi-source data with SQL and Python, selecting 200+ predictive variables to enhance pre-loan risk model discrimination.  
+- Developed APP-behavior risk features and trained logistic regression and decision tree models, achieving KS=0.23 and deriving implementable risk control rules.  
 
-传山私募基金 | 深度学习实习生 | 2024.1-2024.5  
-- 使用Python处理金融时间序列数据，完成数据清洗、缺失值填充与标准化预处理。  
-- 设计基于Transformer的量化策略，通过参数调优提升策略稳健性与超额收益。  
+**Machine Learning & Quant Research Intern** | Chuan Shan Private Equity Fund | Jan 2024 – May 2024  
+- Optimized prediction accuracy using ensemble methods like XGBoost and LightGBM, with hyperparameter tuning via Bayesian optimization.  
+- Engineered a high-performance backtesting framework that reduced runtime from 4 hours to 35 minutes and improved annualized return by 4.2%.  
 
-### 研究经历
-香港科技大学 | 研究助理（深度学习） | 2023.9-2024.1  
-- 处理NGSIM轨迹数据，提取时序特征并建模驾驶风格差异。  
-- 基于逆强化学习重建奖励函数，优化模型性能，降低跟踪误差与高风险行为占比。  
-- 研究成果发表于IEEE IV 2024会议。  
+## Education
+**M.S. in Computer Engineering** | Columbia University | Sep 2024 – Dec 2025 | New York, USA  
+- Relevant Courses: Databases, Deep Learning for Edge Computing, Data Center Networks, C++  
 
-### 技能
-- 编程语言: Python, SQL, C++  
-- 数据分析: Pandas, NumPy, Hive, Presto, ETL, 数据清洗  
-- 机器学习: 逻辑回归, 决策树, XGBoost, LightGBM, 随机森林, 深度学习  
-- 工具与平台: Tableau, Excel, Git, Linux, MySQL  
+**B.S. in Automation Science and Technology** | Xi'an Jiaotong University | Aug 2019 – Jul 2023 | Xi'an, China  
+- Honors: University Scholarship (2019–2020, 2021–2022), Outstanding Student (2019–2020)  
+- Relevant Courses: Data Structures and Algorithms (Python), Object-Oriented Design, Operations Research (Python), Network and Information Security  
 
-### 荣誉/证书
-（无相关荣誉/证书信息，保留原始结构）
+## Skills
+- **Programming Languages:** Python, C, C++, SQL  
+- **Risk Modeling & Machine Learning:** Logistic Regression, Decision Trees, XGBoost, Random Forest, Bayesian Methods, Feature Engineering, IV/KS/Lift Analysis  
+- **Data Analytics & Tools:** Hive, Presto, Pandas, NumPy, ETL Pipelines, Data Cleaning, Tableau  
+- **Systems & Software:** Linux, Git, MySQL, Openpyxl

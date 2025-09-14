@@ -2,25 +2,52 @@ from typing import Literal
 from config import get_client
 from utils import detect_lang
 
-def tailor_resume_text(jd_text: str, resume_text: str, out_fmt: Literal["markdown","plain"]="markdown") -> str:
+def tailor_resume_text(
+    jd_text: str,
+    resume_text: str,
+    out_fmt: Literal["markdown","plain"]="markdown"
+) -> str:
     """
-    调 DeepSeek R1（deepseek-reasoner），把 PDF 文本与 JD 合并改写为 Markdown。
-    语言：严格跟随原简历语言（中文/英文）。
-    中文：不生成摘要；建议使用 教育背景/实习经历/项目经历/技能/荣誉证书 等分节。
+    用 DeepSeek-R1 改写简历，强制分节顺序：
+    1) 教育经历 / Education
+    2) 实习/工作经历（其后可接科研经历/Research）/ Experience (+ Research)
+    3) 技能 / Skills
+    （可选：项目经历 / Projects，荣誉/证书 / Awards & Certificates）
     """
     client = get_client()
     lang = detect_lang(resume_text)
+
+    # 语言与分节规范
     lang_rule = (
         "The output language MUST strictly match the original resume language. "
         "If the resume is Chinese, output in Chinese; if it is English, output in English. "
     )
     zh_extra = (
-        "When the output is Chinese, DO NOT include a Summary/摘要 section; "
-        "use section titles: 教育背景、实习经历、项目经历（如有）、研究经历（如有）、技能、荣誉/证书。 "
-        "Each position/education line should be formatted like: "
-        "### 机构或公司 | 岗位或学位(可选) | 起止日期 | 地点(可选)"
+        "When the output is Chinese, DO NOT include a Summary/摘要 section. "
+        "Use the following section order and titles exactly (omit empty ones):\n"
+        "1) 教育背景\n"
+        "2) 实习经历（若有全职可合并命名为 工作/实习经历）\n"
+        "3) 科研经历（可选；如条目较少，也可并入上一节末尾）\n"
+        "4) 项目经历（可选）\n"
+        "5) 技能\n"
+        "6) 荣誉/证书（可选）\n"
+        "Each position/education headline MUST be a single Markdown line in the form:\n"
+        "### 机构或公司 | 岗位或学位(可选) | 起止日期 | 地点(可选)\n"
+        "For bullets: concise, data-backed when available, no fabrication."
     )
-    en_extra = ""
+    en_extra = (
+        "Do NOT include a Summary section. "
+        "Use the following section order and titles exactly (omit empty ones):\n"
+        "1) Education\n"
+        "2) Experience\n"
+        "3) Research Experience (optional; if short, may be appended after Experience)\n"
+        "4) Projects (optional)\n"
+        "5) Skills\n"
+        "6) Awards & Certificates (optional)\n"
+        "Each headline MUST be a single Markdown line in the form:\n"
+        "### Organization | Title or Degree (optional) | Dates | Location (optional)\n"
+        "Bullets must be concise and factual (no fabrication)."
+    )
 
     system_msg = (
         "You are a senior resume editor. "
@@ -30,7 +57,9 @@ def tailor_resume_text(jd_text: str, resume_text: str, out_fmt: Literal["markdow
         "Reorder sections if needed. Keep length reasonable. "
         + lang_rule +
         (zh_extra if lang == "zh" else en_extra) +
-        f" Output format: {out_fmt}. Return ONLY the content between <OUTPUT> and </OUTPUT>."
+        " The final document MUST follow the section order above. "
+        "Avoid duplicate content across sections; merge overlapping items sensibly. "
+        f"Output format: {out_fmt}. Return ONLY the content between <OUTPUT> and </OUTPUT>."
     )
 
     user_msg = f"""
@@ -42,11 +71,11 @@ def tailor_resume_text(jd_text: str, resume_text: str, out_fmt: Literal["markdow
 
 [REWRITE_REQUIREMENTS]
 - No fabrication. If a point lacks numbers, improve wording but do not invent metrics.
-- Prioritize JD-relevant skills/experience; de-emphasize irrelevant content.
-- Prefer short sentences and scannable bullets.
+- Prioritize JD-relevant skills/experience; de-emphasize or remove irrelevant content.
+- Prefer short, scannable bullets (1–2 lines each).
 - Keep names, dates, institutions factual.
 - If conflicting info appears, choose the safer/less specific variant without creating new facts.
-- Optimize for ATS (keywords) but keep natural language.
+- Ensure the section ORDER matches the spec in the system message.
 
 Return:
 <OUTPUT>
@@ -57,8 +86,8 @@ Return:
     resp = client.chat.completions.create(
         model="deepseek-reasoner",
         messages=[
-            {"role":"system","content": system_msg},
-            {"role":"user","content": user_msg},
+            {"role": "system", "content": system_msg},
+            {"role": "user", "content": user_msg},
         ],
         max_tokens=8000,
     )

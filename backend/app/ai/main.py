@@ -8,7 +8,7 @@ from md2pdf import md_to_latex_to_pdf
 def main():
     parser = argparse.ArgumentParser(description="JD+PDF 简历 → 改写并导出 DOCX")
     parser.add_argument("--jd", default="backend/app/ai/jd.txt", help="JD 文本文件路径")
-    parser.add_argument("--pdf", default="backend/app/ai/test_Resume2.pdf", help="PDF 简历路径")
+    parser.add_argument("--pdf", default="backend/app/ai/test_Resume.pdf", help="PDF 简历路径")
     parser.add_argument("--out-md", default="backend/app/ai/resume_tailored.md")
     #parser.add_argument("--out-docx", default="backend/app/ai/resume_tailored.docx")
     parser.add_argument("--out-pdf", default="backend/app/ai/resume_tailored.pdf")
