@@ -1,4 +1,4 @@
-# Resume Helper — 智能简历系统
+# 轻简 — 智能简历系统
 
 基于 FastAPI + React 的智能简历平台：支持岗位爬取、AI 简历优化、用户认证，以及完整的容器化与 GitOps 部署流程。
 
@@ -28,6 +28,47 @@
 - `make build` 构建镜像
 - `make deploy` 触发远端部署（需配置 GitHub Actions 与服务器）
 
+## 本地 Docker 运行（快速指南）
+
+1) 准备环境变量（第一次）
+- 在仓库根目录：
+  - `cp .env.example .env`
+  - 根据需要修改：`DB_USER`、`DB_PASSWORD`、`REDIS_PASSWORD`
+
+2) 启动与构建
+- 运行：`docker compose up -d --build postgres redis elasticsearch backend frontend nginx`
+
+3) 初始化数据库
+- 迁移：`docker compose exec backend alembic upgrade head`
+
+4) 打开应用
+- 浏览器访问：`http://127.0.0.1/`
+- API 通过 Nginx 代理：`http://127.0.0.1/api/v1`
+
+5) 快速验证（可选）
+- 注册：
+  - `curl -X POST http://127.0.0.1/api/v1/auth/register -H 'content-type: application/json' -d '{"email":"test@example.com","password":"secret123"}'`
+- 登录：
+  - `curl -X POST http://127.0.0.1/api/v1/auth/login -H 'content-type: application/json' -d '{"email":"test@example.com","password":"secret123"}'`
+- 当前用户：
+  - `curl -H "authorization: Bearer <token>" http://127.0.0.1/api/v1/users/me`
+
+6) 停止服务
+- `docker compose down`
+
+提示
+- 如遇页面能打开但静态资源 404，请确保已使用本文 Nginx 配置并已成功构建前端镜像（compose 会自动完成）。
+- 若后端提示数据表不存在，请先执行上面的数据库迁移命令。
+
+### 数据库迁移（Alembic）
+- 初始化（已配置好）：`backend/alembic.ini`、`backend/alembic/env.py`
+- 生成新迁移：
+  1. 修改/新增 SQLAlchemy 模型（`backend/app/models`）
+  2. 运行：`cd backend && alembic revision --autogenerate -m "describe changes"`
+  3. 升级：`cd backend && alembic upgrade head`
+  4. 回滚：`cd backend && alembic downgrade -1`
+
+
 ## 环境变量
 
 - 后端：`backend/.env.example`
@@ -41,4 +82,3 @@
 ## 状态
 
 当前仓库提供完整脚手架与最小可运行接口（/health、/api/v1/jobs 等）。你可以在此基础上，逐步补全业务逻辑、数据库模型、爬虫与 AI 能力。
-

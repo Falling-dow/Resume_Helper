@@ -34,7 +34,7 @@ services:
   backend:
     build: ./backend
     environment:
-      DATABASE_URL: postgresql://${DB_USER}:${DB_PASSWORD}@postgres:5432/resume_db
+      DATABASE_URL: postgresql+psycopg://${DB_USER}:${DB_PASSWORD}@postgres:5432/resume_db
       REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379/0
       ELASTICSEARCH_URL: http://elasticsearch:9200
       CORS_ORIGINS: http://localhost:3000,http://localhost
@@ -52,7 +52,7 @@ services:
     build: ./backend
     command: celery -A app.core.celery_app worker --loglevel=info
     environment:
-      DATABASE_URL: postgresql://${DB_USER}:${DB_PASSWORD}@postgres:5432/resume_db
+      DATABASE_URL: postgresql+psycopg://${DB_USER}:${DB_PASSWORD}@postgres:5432/resume_db
       REDIS_URL: redis://:${REDIS_PASSWORD}@redis:6379/0
     depends_on:
       - backend
@@ -71,9 +71,13 @@ services:
       - ./backend:/app
 
   frontend:
-    build: ./frontend
+    build:
+      context: ./frontend
+      args:
+        # Let Vite bake the API base into the build for Nginx
+        VITE_API_BASE_URL: /api/v1
     environment:
-      VITE_API_URL: http://backend:8000
+      VITE_API_BASE_URL: /api/v1
     depends_on:
       - backend
     ports:
@@ -96,4 +100,3 @@ volumes:
   redis_data:
   es_data:
   uploaded_files:
-
