@@ -1,0 +1,6 @@
+openai>=1.43.0
+pdfplumber
+PyPDF2
+pillow
+pytesseract
+python-docx
